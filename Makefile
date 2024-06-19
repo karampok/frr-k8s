@@ -1,5 +1,5 @@
 ifeq (,$(FRRK8S_VERSION))
-IMG_TAG="dev"
+IMG_TAG="main"
 GOBIN=$(shell go env GOPATH)/bin
 else
 IMG_TAG=v${FRRK8S_VERSION}
@@ -66,7 +66,8 @@ vet: ## Run go vet against code.
 
 .PHONY: test
 test: manifests generate fmt vet envtest ## Run tests.
-	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test ./... -coverprofile cover.out
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" \
+	go test ./... -coverprofile cover.out
 
 ##@ Build
 
@@ -120,7 +121,7 @@ export KUBECONFIG=$(KUBECONFIG_PATH)
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.0.0
-CONTROLLER_TOOLS_VERSION ?= v0.11.3
+CONTROLLER_TOOLS_VERSION ?= v0.14.0
 KUBECTL_VERSION ?= v1.27.0
 GINKGO_VERSION ?= v2.11.0
 KIND_VERSION ?= v0.19.0

@@ -89,6 +89,12 @@ type Neighbor struct {
 	// +kubebuilder:validation:Maximum=4294967295
 	ASN uint32 `json:"asn"`
 
+	// SourceAddress is the IPv4 or IPv6 source address to use for the BGP
+	// session to this neighbour, may be specified as either an IP address
+	// directly or as an interface name
+	// +optional
+	SourceAddress string `json:"sourceaddress,omitempty"`
+
 	// Address is the IP address to establish the session with.
 	Address string `json:"address"`
 
@@ -145,6 +151,11 @@ type Neighbor struct {
 	// ToReceive represents the list of prefixes to receive from the given neighbor.
 	// +optional
 	ToReceive Receive `json:"toReceive,omitempty"`
+
+	// To set if we want to disable MP BGP that will separate IPv4 and IPv6 route exchanges into distinct BGP sessions.
+	// +optional
+	// +kubebuilder:default:=false
+	DisableMP bool `json:"disableMP,omitempty"`
 }
 
 // Advertise represents a list of prefixes to advertise to the given neighbor.

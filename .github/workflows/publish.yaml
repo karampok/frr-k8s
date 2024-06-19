@@ -7,22 +7,16 @@ on:
     tags:
       - v*
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   unit-tests:
     runs-on: ubuntu-22.04
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.12.0
-        with:
-          access_token: ${{ github.token }}
-
       - name: Checkout
         uses: actions/checkout@v4
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: "go.mod"
-          cache: true
 
       - uses: actions/setup-go@v5
         with:
@@ -44,7 +38,6 @@ jobs:
           make manifests
           make checkuncommitted
 
-
   publish-images:
     runs-on: ubuntu-22.04
     needs: [unit-tests]
@@ -58,7 +51,7 @@ jobs:
       - name: Install Cosign
         uses: sigstore/cosign-installer@main
         with:
-          cosign-release: "v1.13.1"
+          cosign-release: "v2.2.3"
 
       - name: Code checkout
         uses: actions/checkout@v4
@@ -104,10 +97,11 @@ jobs:
             GIT_COMMIT: ${{ github.sha }}
 
       - name: Cosign sign tags
-        run: cosign sign ${TAGS}
+        run: cosign sign --yes ${TAGS}
         env:
           TAGS: ${{ steps.meta.outputs.tags }}@${{ steps.build-and-push.outputs.digest }}
           COSIGN_EXPERIMENTAL: 1
+
   release-charts:
     needs: [publish-images]
     runs-on: ubuntu-22.04
@@ -117,6 +111,7 @@ jobs:
         with:
           # Fetch entire history. Required for chart-releaser; see https://github.com/helm/chart-releaser-action/issues/13#issuecomment-602063896
           fetch-depth: 0
+
       - name: Configure Git
         run: |
           git config user.name "$GITHUB_ACTOR"
@@ -132,7 +127,6 @@ jobs:
           repo=$(basename "$GITHUB_REPOSITORY")
           owner=$(dirname "$GITHUB_REPOSITORY")
           tag="${GITHUB_REF_NAME:1}"
-
           exists=$(curl -s -H "Accept: application/vnd.github.v3+json" https://github.com/$GITHUB_REPOSITORY/releases/tag/$repo-chart-$tag -w %{http_code} -o /dev/null)
           if [[ $exists != "200" ]]; then
             echo "Creating release..."

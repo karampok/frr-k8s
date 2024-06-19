@@ -226,6 +226,7 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `asn` _integer_ | ASN is the AS number to use for the local end of the session. |
+| `sourceaddress` _string_ | SourceAddress is the IPv4 or IPv6 source address to use for the BGP session to this neighbour, may be specified as either an IP address directly or as an interface name |
 | `address` _string_ | Address is the IP address to establish the session with. |
 | `port` _integer_ | Port is the port to dial when establishing the session. Defaults to 179. |
 | `password` _string_ | Password to be used for establishing the BGP session. Password and PasswordSecret are mutually exclusive. |
@@ -237,6 +238,7 @@ _Appears in:_
 | `bfdProfile` _string_ | BFDProfile is the name of the BFD Profile to be used for the BFD session associated to the BGP session. If not set, the BFD session won't be set up. |
 | `toAdvertise` _[Advertise](#advertise)_ | ToAdvertise represents the list of prefixes to advertise to the given neighbor and the associated properties. |
 | `toReceive` _[Receive](#receive)_ | ToReceive represents the list of prefixes to receive from the given neighbor. |
+| `disableMP` _boolean_ | To set if we want to disable MP BGP that will separate IPv4 and IPv6 route exchanges into distinct BGP sessions. |
 
 
 #### PrefixSelector
